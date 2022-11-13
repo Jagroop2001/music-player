@@ -62,20 +62,22 @@
                         </button>
                     </form>
                     <!-- Registration Form -->
-                    <form v-show="tab === 'register'">
+                    <vee-form v-show="tab === 'register'" :validation-schema="schema">
                         <!-- Name -->
                         <div class="mb-3">
                             <label class="inline-block mb-2">Name</label>
-                            <input type="text"
+                            <vee-field type="text" name="name"
                                 class="block w-full py-1.5 px-3 text-gray-800 border border-gray-300 transition duration-500 focus:outline-none focus:border-black rounded"
                                 placeholder="Enter Name" />
+                            <ErrorMessage class="text-red-600" name="name" />
                         </div>
                         <!-- Email -->
                         <div class="mb-3">
                             <label class="inline-block mb-2">Email</label>
-                            <input type="email"
+                            <vee-field type="email" name="email"
                                 class="block w-full py-1.5 px-3 text-gray-800 border border-gray-300 transition duration-500 focus:outline-none focus:border-black rounded"
                                 placeholder="Enter Email" />
+                            <ErrorMessage class="text-red-600" name="email" />
                         </div>
                         <!-- Age -->
                         <div class="mb-3">
@@ -116,7 +118,7 @@
                             class="block w-full bg-purple-600 text-white py-1.5 px-3 rounded transition hover:bg-purple-700">
                             Submit
                         </button>
-                    </form>
+                    </vee-form>
                 </div>
             </div>
         </div>
@@ -125,13 +127,23 @@
 
 <script>
 import { mapState, mapWritableState } from 'pinia';
+import { ErrorMessage } from 'vee-validate';
 import useModalStore from '../stores/modal.js'
 export default {
     name: "AppAuth",
     data() {
         return {
             tab: "login",
-        }
+            schema: {
+                name: "required|min:3|max:100|alpha_spaces",
+                email: "required|min:3|max:100|email",
+                age: "",
+                password: "",
+                confirm_password: "",
+                country: "",
+                tos: ""
+            }
+        };
     },
     computed: {
         ...mapState(useModalStore, ["hiddenClass"]),
@@ -139,10 +151,7 @@ export default {
             modalVisibility: "isOpen",
         })
     },
-
-
-
-
+    components: { ErrorMessage }
 }
 
 </script>
