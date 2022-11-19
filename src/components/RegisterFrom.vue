@@ -78,8 +78,14 @@
 </template>
 
 <script>
+import { auth, userCollection } from '../includes/firebase';
+import { mapWritableState } from 'pinia'
+import userStore from '../stores/user'
 export default {
     name: "RegisterForm",
+    computed: {
+        ...mapWritableState(userStore, ['userLoggedIn'])
+    },
     data() {
         return {
             schema: {
@@ -101,15 +107,41 @@ export default {
         }
     },
     methods: {
-        register(values) {
+        async register(values) {
             this.reg_show_alert = true;
             this.reg_in_submission = true;
             this.reg_alert_valiant = "bg-blue-500"
             this.reg_alert_msg = "Please wait !! Your Account is being created";
 
+            let userCred = null;
+            try {
+                userCred = await auth.createUserWithEmailAndPassword(
+                    values.email, values.password
+                );
+            } catch (error) {
+                this.reg_alert_valiant = "bg-red-500";
+                this.reg_alert_msg = "An Unexpected error Occured. Please try again later."
+                return;
+            }
+
+            try {
+                await userCollection.add({
+                    name: values.name,
+                    email: values.email,
+                    age: values.age,
+                    country: values.country
+                });
+
+            } catch (error) {
+                this.reg_alert_valiant = "bg-red-500";
+                this.reg_alert_msg = "An Unexpected error Occured. Please try again later."
+                return;
+            }
+
+            this.userStore.userLoggedIn = true;
             this.reg_alert_valiant = "bg-green-500"
             this.reg_alert_msg = "Success !! Your account has been created."
-            console.log(values);
+            console.log(userCred);
         },
     }
 }
